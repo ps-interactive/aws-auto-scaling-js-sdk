@@ -5,9 +5,10 @@ AWS.config.region = 'us-west-2';
 const autoScaling = new AWS.AutoScaling()
 const elb = new AWS.ELBv2()
 
+const launchConfigurationName = 'carved-rock-lc'
+
 const createLaunchConfiguration = () => {
   /* Needs a Security Group port 3000: Should it be created with terraform or js? */
-  const launchConfigurationName = 'carved-rock-lc'
   const userData = 'IyEvYmluL2Jhc2gNCmN1cmwgLXNMIGh0dHBzOi8vZGViLm5vZGVzb3VyY2UuY29tL3NldHVwXzE0LnggfCBzdWRvIC1FIGJhc2ggLQ0Kc3VkbyBhcHQtZ2V0IGluc3RhbGwgLXkgbm9kZWpzIGdpdA0KZ2l0IGNsb25lIGh0dHBzOi8vZ2l0aHViLmNvbS9wcy1pbnRlcmFjdGl2ZS9hd3MtYXV0by1zY2FsaW5nLWFwcA0KY2QgYXdzLWF1dG8tc2NhbGluZy1hcHANCm5wbSBpDQpucG0gcnVuIHN0YXJ0'
 
   const params = {
@@ -40,10 +41,10 @@ const createTargetGroup = () => {
   elb.createTargetGroup(params).promise();
 };
 
-const createListener = () => {
-  const targetARN = '';
-  const loadBalancerARN = '';
 
+const targetARN = '';
+const loadBalancerARN = '';
+const createListener = () => {
   const params = {
     DefaultActions: [{
       TargetGroupArn: targetARN,
@@ -56,10 +57,9 @@ const createListener = () => {
   elb.createListener(params).promise();
 };
 
+const autoScalingGroupName = 'carved-rock-asg';
+const policyName = `${autoScalingGroupName}-policy`
 const createAutoScalingGroup = () => {
-  const autoScalingGroupName = 'carved-rock-asg';
-  const policyName = `${autoScalingGroupName}-policy`
-
   const params = {
     AutoScalingGroupName: autoScalingGroupName,
     AvailabilityZones: ['us-west-2a', 'us-west-2b'],

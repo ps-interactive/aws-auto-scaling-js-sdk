@@ -1,0 +1,25 @@
+{
+  "name": "aws-auto-scaling-js-sdk",
+  "version": "1.0.0",
+  "description": "Lab Resources for EC2 JavaScript SDK",
+  "main": "ec2.js",
+  "dependencies": {
+    "aws-sdk": "^2.675.0",
+    "lodash": "^4.17.15",
+    "minimist": "^1.2.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tjbell/aws-auto-scaling-js-sdk.git"
+  },
+  "author": "Thomas Bell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tjbell/aws-auto-scaling-js-sdk/issues"
+  },
+  "homepage": "https://github.com/tjbell/aws-auto-scaling-js-sdk#readme"
+}

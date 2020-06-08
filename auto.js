@@ -22,7 +22,7 @@ const createLaunchConfiguration = () => {
 
 const createLoadBalancer = () => {
   /* Needs a Security Group port 80: Should it be created with terraform or js?*/
-  const lparams = {
+  const params = {
     Name: 'carved-rock-lb',
     Subnets: ['', ''],
     SecurityGroups: []

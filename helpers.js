@@ -1,71 +1,68 @@
+const fs = require('fs')
+
 const _ = require('lodash')
 const AWS = require('aws-sdk')
+
 AWS.config.region = 'us-west-2';
 AWS.config.apiVersions = { ec2: '2016-11-15' };
 
 const ec2 = new AWS.EC2();
 
 const parse = require('minimist')(process.argv.slice(2));
-
 const command = parse._[0];
-const args = parse._.slice(1);
+const resourceName = parse._[1];
 
 const message = (err, data) => {
   if (err) { console.log(`Error: ${err.message}`); }
-  else if (data) { console.log(`Success: ${JSON.stringify(data)}`); }
+  else if (data) {
+    const json = JSON.stringify(data);
+    if(Object.keys(data).length > 1) {
+      fs.writeFileSync(`json/${Object.keys(data)[1]}.json`, json, 'utf-8');
+    }
+    console.log(`Success: ${json}`);
+  }
 };
 
-const handle = (promise) => {
-  return promise
-    .then(data => ([data, undefined]))
-    .catch(error => Promise.resolve([undefined, error]));
-}
+const readJSON = (filename) => fs.existsSync(`json/${filename}.json`) ? JSON.parse(fs.readFileSync(`json/${filename}.json`)) : undefined;
 
-const vpcIdAsync = async (vpc) => await vpc.Vpcs[0].VpcId;
-const getVpcId = async () => {
-  const params = { Filters: [{Name: 'isDefault', Values: ['true']}] };
-  let [vpc, vpcErr] = await handle(ec2.describeVpcs(params).promise());
-  if (vpcErr) throw new Error('Could not fetch VPC details.');
-  let [vpcId, vpcIdErr] = await handle(vpcIdAsync(vpc));
-  if (vpcIdErr) throw new Error('Could not fetch Subnet details.');
-  return vpcId;
-}
-
-const createSecurityGroup = async (name, port) => {
-  const params = { Description: name, GroupName: name };
-  ec2.createSecurityGroup(params, (err, data) => {
+const defaultSecurityGroupIngress = () => {
+  const sgParams = { Filters: [{Name: 'group-name', Values: ['default']}] };
+  ec2.describeSecurityGroups(sgParams, (err, data) => {
     if (err) { console.log(`Error: ${err.message}`); }
     else { 
-
       const ingressParams = {
-        GroupId: data.GroupId,
+        GroupId: data.SecurityGroups[0].GroupId,
         IpPermissions: [{
           IpProtocol: 'tcp',
-          FromPort: port,
-          ToPort: port,
+          FromPort: 80,
+          ToPort: 80,
+          IpRanges: [{ CidrIp: '0.0.0.0/0' }]
+        }, {
+          IpProtocol: 'tcp',
+          FromPort: 3000,
+          ToPort: 3000,
           IpRanges: [{ CidrIp: '0.0.0.0/0' }]
         }]
       };
       ec2.authorizeSecurityGroupIngress(ingressParams, message);
     }
   });
-}
-
-const sortSubnets = async (subnets) => {
-  return await _.map(_.sortBy(subnets.Subnets, 'AvailabilityZone'), subnet => subnet.SubnetId).slice(1, 3);
 };
 
-const getSubnetIds = async () => {
+const setup = async () => {
   const params = { Filters: [{Name: 'isDefault', Values: ['true']}] };
-  let [vpc, vpcErr] = await handle(ec2.describeVpcs(params).promise());
-  if (vpcErr) throw new Error('Could not fetch VPC details.');
-  const vpcId = vpc.Vpcs[0].VpcId
-  const subnetParams = { Filters: [{Name: "vpc-id", Values: [vpcId]}] };
-  let [subnets, subnetsErr] = await handle(ec2.describeSubnets(subnetParams).promise());    
-  if (subnetsErr) throw new Error('Could not fetch Subnet details.');
-  let [subnetIds, subnetIdsErr] = await handle(sortSubnets(subnets));
-  if (subnetIdsErr) throw new Error('Could not fetch Subnet details.');
-  return subnetIds;
-}
+  ec2.describeVpcs(params, (err, data) => {
+    if (err) { console.log(`Error: ${err.message}`); }
+    else {
+      fs.writeFileSync('json/Vpcs.json', JSON.stringify(data), 'utf-8');
+      const subnetParams = { Filters: [{Name: "vpc-id", Values: [data.Vpcs[0].VpcId]}] };
+      ec2.describeSubnets(subnetParams, (err, data) => {
+        if (err) { console.log(`Error: ${err.message}`); }
+        else { fs.writeFileSync(`json/Subnets.json`, JSON.stringify(data), 'utf-8'); }
+      });
+    }
+  });
+  defaultSecurityGroupIngress();
+};
 
-module.exports = { command, args, message, createSecurityGroup, getSubnetIds, getVpcId };
+module.exports = { command, resourceName, message, readJSON, setup };

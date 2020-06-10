@@ -67,7 +67,7 @@ const createAutoScalingGroup = (name, lcName) => {
       AutoScalingGroupName: name,
       AvailabilityZones: ['us-west-2a', 'us-west-2b', 'us-west-2c', 'us-west-2d'],
       TargetGroupARNs: [ targetGroup.TargetGroups[0].TargetGroupArn ],
-      LaunchConfigurationName: 'carved-rock-lc',
+      LaunchConfigurationName: lcName,
       MaxSize: 2,
       MinSize: 1
     };
@@ -77,11 +77,11 @@ const createAutoScalingGroup = (name, lcName) => {
   }
 };
 
-const putScalingPolicy = (name, ASGName) => {
+const putScalingPolicy = (name) => {
   const params = {
     AdjustmentType: 'ChangeInCapacity',
-    AutoScalingGroupName: ASGName,
-    PolicyName: name,
+    AutoScalingGroupName: name,
+    PolicyName: `${name}-policy`,
     PolicyType: 'TargetTrackingScaling',
     TargetTrackingConfiguration: {
       TargetValue: 5,

@@ -112,7 +112,7 @@ switch (command) {
     createAutoScalingGroup(resourceName, linkedResourceName);
     break;
   case 'policy':
-    putScalingPolicy(resourceName, linkedResourceName);
+    putScalingPolicy(resourceName);
     break;
   default:
     console.error('Not a valid command!');

@@ -11,6 +11,7 @@ const ec2 = new AWS.EC2();
 const parse = require('minimist')(process.argv.slice(2));
 const command = parse._[0];
 const resourceName = parse._[1];
+const linkedResourceName = parse._[2];
 
 const message = (err, data) => {
   if (err) { console.log(`Error: ${err.message}`); }
@@ -24,6 +25,10 @@ const message = (err, data) => {
 };
 
 const readJSON = (filename) => fs.existsSync(`json/${filename}.json`) ? JSON.parse(fs.readFileSync(`json/${filename}.json`)) : undefined;
+
+const sortSubnets = (subnets) => {
+  return _.map(_.sortBy(subnets.Subnets, 'AvailabilityZone'), subnet => subnet.SubnetId);
+};
 
 const defaultSecurityGroupIngress = () => {
   const sgParams = { Filters: [{Name: 'group-name', Values: ['default']}] };
@@ -65,4 +70,4 @@ const setup = async () => {
   defaultSecurityGroupIngress();
 };
 
-module.exports = { command, resourceName, message, readJSON, setup };
+module.exports = { command, resourceName, linkedResourceName, message, readJSON, setup, sortSubnets };

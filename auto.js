@@ -17,7 +17,7 @@ const createLaunchConfiguration = (name) => {
     };
     autoScaling.createLaunchConfiguration(params, message);
   } else {
-    console.log("There was an error reading the `UserData.json` file.")
+    console.log("There was an error reading the `UserData.json` file.");
   }
 };
 
@@ -27,7 +27,7 @@ const createLoadBalancer = (name) => {
     const params = { Name: name, Subnets: json.Subnets };
     elb.createLoadBalancer(params, message);
   } else {
-    console.log("There was an error reading the `Subnets.json` file. Have you run the `setup` command?")
+    console.log("There was an error reading the `Subnets.json` file. Have you run the `setup` command?");
   }
 };
 
@@ -37,7 +37,7 @@ const createTargetGroup = (name) => {
     const params = { Name: name, Port: 3000, Protocol: 'HTTP', VpcId: json.Vpcs[0].VpcId };
     elb.createTargetGroup(params, message);
   }  else {
-    console.log("There was an error reading the `Vpcs.json` file. Have you run the `setup` command?")
+    console.log("There was an error reading the `Vpcs.json` file. Have you run the `setup` command?");
   }
 };
 
@@ -56,12 +56,12 @@ const createListener = () => {
     };
     elb.createListener(params, message);
   } else {
-    console.log('Have you created a Target Group and a Load Balancer?')
+    console.log('Have you created a Target Group and a Load Balancer?');
   }
 };
 
 const autoScalingGroupName = 'carved-rock-asg';
-const policyName = `${autoScalingGroupName}-policy`
+const policyName = `${autoScalingGroupName}-policy`;
 const createAutoScalingGroup = () => {
   const targetGroupArn = readJSON('TargetGroups');
   if (targetGroupArn) {
@@ -75,7 +75,7 @@ const createAutoScalingGroup = () => {
     };
     autoScaling.createAutoScalingGroup(params, message);
   } else {
-    console.log('Have you created a Target Group?')
+    console.log('Have you created a Target Group?');
   }
 };
 

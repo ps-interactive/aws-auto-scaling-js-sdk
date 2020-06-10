@@ -13,21 +13,6 @@ const command = parse._[0];
 const resourceName = parse._[1];
 const linkedResourceName = parse._[2];
 
-const message = (err, data) => {
-  if (err) { console.log(`Error: ${err.message}`); }
-  else if (data) {
-    const json = JSON.stringify(data);
-    if(Object.keys(data).length > 1) {
-      fs.writeFileSync(`json/${Object.keys(data)[1]}.json`, json, 'utf-8');
-    }
-    console.log(`Success: ${json}`);
-  }
-};
-
-const readJSON = (filename) => fs.existsSync(`json/${filename}.json`) ? JSON.parse(fs.readFileSync(`json/${filename}.json`)) : undefined;
-
-const sortSubnets = (subnets) => _.map(_.sortBy(subnets.Subnets, 'AvailabilityZone'), subnet => subnet.SubnetId);
-
 const defaultSecurityGroupIngress = () => {
   const sgParams = { Filters: [{Name: 'group-name', Values: ['default']}] };
   ec2.describeSecurityGroups(sgParams, (err, data) => {
@@ -68,4 +53,4 @@ const setup = async () => {
   defaultSecurityGroupIngress();
 };
 
-module.exports = { command, resourceName, linkedResourceName, message, readJSON, setup, sortSubnets };
+module.exports = { command, resourceName, linkedResourceName, setup };

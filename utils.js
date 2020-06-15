@@ -1,5 +1,7 @@
 const fs = require('fs');
 
+const _ = require('lodash');
+
 const message = (err, data) => {
   if (err) { console.log(`Error: ${err.message}`); }
   else if (data) {

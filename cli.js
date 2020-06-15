@@ -1,7 +1,7 @@
 const fs = require('fs');
-
-const _ = require('lodash');
 const AWS = require('aws-sdk');
+
+const { message } = require('./utils.js');
 
 AWS.config.region = 'us-west-2';
 AWS.config.apiVersions = { ec2: '2016-11-15' };
